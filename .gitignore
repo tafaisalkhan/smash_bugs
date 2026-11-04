@@ -1,0 +1,41 @@
+# Godot 4.x
+.godot/
+*.import
+
+# Build and output artifacts
+build/
+android/build/
+android/.gradle/
+*.apk
+*.aab
+*.ap_
+local.properties
+
+# Exclude all assets as requested ("no assest")
+assets/
+*.png
+*.jpg
+*.jpeg
+*.svg
+*.mp3
+*.ogg
+*.wav
+*.ttf
+*.otf
+*.webp
+
+# Exclude JSON files as requested ("no jons")
+*.json
+**/*.json
+
+# Exclude keystores as requested ("no keystore")
+*.keystore
+*.jks
+**/*.keystore
+**/*.jks
+
+# Temporary and log files
+test_gameplay_out.txt
+*.log
+.DS_Store
+Thumbs.db

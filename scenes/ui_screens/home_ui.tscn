@@ -1,0 +1,376 @@
+[gd_scene load_steps=16 format=3]
+
+[ext_resource type="FontVariation" path="res://resources/ui_bold_font.tres" id="bold_font"]
+
+[ext_resource type="Script" path="res://scripts/ui_screens/home_screen.gd" id="script"]
+[ext_resource type="Theme" path="res://resources/ui_suite_theme.tres" id="theme"]
+[ext_resource type="StyleBox" path="res://resources/ui_white_card.tres" id="card"]
+[ext_resource type="StyleBox" path="res://resources/ui_clear_panel.tres" id="clear"]
+[ext_resource type="StyleBox" path="res://resources/ui_red_button.tres" id="red"]
+[ext_resource type="StyleBox" path="res://resources/ui_blue_button.tres" id="blue"]
+[ext_resource type="StyleBox" path="res://resources/ui_light_button.tres" id="light"]
+[ext_resource type="Material" path="res://resources/ui_home_sky_material.tres" id="sky_material"]
+[ext_resource type="FontVariation" path="res://resources/ui_heading_font.tres" id="heading_font"]
+[ext_resource type="StyleBox" path="res://resources/ui_score_card.tres" id="score_card"]
+[ext_resource type="StyleBox" path="res://resources/ui_ball.tres" id="ball"]
+[ext_resource type="StyleBox" path="res://resources/ui_ball_glint.tres" id="ball_glint"]
+[ext_resource type="Texture2D" path="res://assets/smash/splash_mascot.png" id="mascot_img"]
+[ext_resource type="StyleBox" path="res://resources/ui_daily_reward_button.tres" id="daily_reward_button"]
+[ext_resource type="StyleBox" path="res://resources/ui_daily_reward_button_disabled.tres" id="daily_reward_button_disabled"]
+
+[node name="HomeUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("theme")
+script = ExtResource("script")
+
+[node name="Background" type="ColorRect" parent="."]
+material = ExtResource("sky_material")
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.44, 0.77, 0.95, 1)
+
+[node name="Ground" type="ColorRect" parent="."]
+layout_mode = 1
+anchor_top = 0.65
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.97, 0.99, 1, 1)
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 26
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 24
+
+[node name="Layout" type="VBoxContainer" parent="Scroll/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 13
+
+[node name="TopBar" type="HBoxContainer" parent="Scroll/Margin/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SettingsButton" type="Button" parent="Scroll/Margin/Layout/TopBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(54, 54)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_styles/normal = ExtResource("light")
+theme_override_colors/font_color = Color(0.1, 0.2, 0.3, 1)
+theme_override_font_sizes/font_size = 27
+text = "⚙"
+
+[node name="Spacer" type="Control" parent="Scroll/Margin/Layout/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StarLabel" type="Label" parent="Scroll/Margin/Layout/TopBar"]
+theme_override_fonts/font = ExtResource("bold_font")
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/normal = ExtResource("card")
+theme_override_font_sizes/font_size = 18
+text = "★  0"
+
+[node name="CoinLabel" type="Label" parent="Scroll/Margin/Layout/TopBar"]
+theme_override_fonts/font = ExtResource("bold_font")
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/normal = ExtResource("card")
+theme_override_font_sizes/font_size = 18
+text = "●  0"
+
+[node name="HeroSpacer" type="Control" parent="Scroll/Margin/Layout"]
+custom_minimum_size = Vector2(0, 67)
+layout_mode = 2
+
+[node name="LogoGroup" type="CenterContainer" parent="Scroll/Margin/Layout"]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+
+[node name="LogoGlyph" type="TextureRect" parent="Scroll/Margin/Layout/LogoGroup"]
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("mascot_img")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="Scroll/Margin/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("heading_font")
+theme_override_colors/font_color = Color(0.87, 0.14, 0.17, 1)
+theme_override_font_sizes/font_size = 52
+text = "YOUR GAME"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="TaglineLabel" type="Label" parent="Scroll/Margin/Layout"]
+theme_override_fonts/font = ExtResource("bold_font")
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.38, 0.47, 0.56, 1)
+theme_override_font_sizes/font_size = 17
+text = "PLAY YOUR WAY"
+horizontal_alignment = 1
+
+[node name="ScoreBox" type="Control" parent="Scroll/Margin/Layout"]
+visible = false
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+
+[node name="ScoreCard" type="PanelContainer" parent="Scroll/Margin/Layout/ScoreBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_styles/panel = ExtResource("score_card")
+
+[node name="ScoreContent" type="VBoxContainer" parent="Scroll/Margin/Layout/ScoreBox/ScoreCard"]
+layout_mode = 2
+alignment = 1
+
+[node name="ScoreCaption" type="Label" parent="Scroll/Margin/Layout/ScoreBox/ScoreCard/ScoreContent"]
+theme_override_fonts/font = ExtResource("bold_font")
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.49, 0.56, 0.64, 1)
+text = "BEST SCORE"
+horizontal_alignment = 1
+
+[node name="ScoreNumber" type="HBoxContainer" parent="Scroll/Margin/Layout/ScoreBox/ScoreCard/ScoreContent"]
+layout_mode = 2
+size_flags_horizontal = 4
+alignment = 1
+theme_override_constants/separation = 4
+
+[node name="ScoreLabel" type="Label" parent="Scroll/Margin/Layout/ScoreBox/ScoreCard/ScoreContent/ScoreNumber"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("heading_font")
+theme_override_colors/font_color = Color(0.1, 0.18, 0.28, 1)
+theme_override_font_sizes/font_size = 54
+text = "0"
+horizontal_alignment = 1
+
+[node name="ScoreUnit" type="Label" parent="Scroll/Margin/Layout/ScoreBox/ScoreCard/ScoreContent/ScoreNumber"]
+theme_override_fonts/font = ExtResource("bold_font")
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.91, 0.17, 0.2, 1)
+theme_override_font_sizes/font_size = 22
+text = "m"
+vertical_alignment = 2
+
+[node name="ScoreLink" type="Button" parent="Scroll/Margin/Layout/ScoreBox/ScoreCard/ScoreContent"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = ExtResource("clear")
+theme_override_colors/font_color = Color(0.18, 0.53, 0.79, 1)
+theme_override_font_sizes/font_size = 18
+text = "View leaderboard ›"
+
+[node name="DailyRewardCard" type="Control" parent="Scroll/Margin/Layout"]
+custom_minimum_size = Vector2(340, 78)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="DailyRewardButton" type="Button" parent="Scroll/Margin/Layout/DailyRewardCard"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+focus_mode = 2
+theme_override_styles/normal = ExtResource("daily_reward_button")
+theme_override_styles/hover = ExtResource("daily_reward_button")
+theme_override_styles/pressed = ExtResource("daily_reward_button")
+theme_override_styles/disabled = ExtResource("daily_reward_button_disabled")
+tooltip_text = "Claim today's daily reward"
+
+[node name="RewardPadding" type="MarginContainer" parent="Scroll/Margin/Layout/DailyRewardCard"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 8
+
+[node name="RewardContent" type="HBoxContainer" parent="Scroll/Margin/Layout/DailyRewardCard/RewardPadding"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+theme_override_constants/separation = 10
+
+[node name="RewardIcon" type="Label" parent="Scroll/Margin/Layout/DailyRewardCard/RewardPadding/RewardContent"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 27
+text = "🎁"
+vertical_alignment = 1
+
+[node name="RewardCopy" type="VBoxContainer" parent="Scroll/Margin/Layout/DailyRewardCard/RewardPadding/RewardContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+alignment = 1
+theme_override_constants/separation = 0
+
+[node name="RewardTitle" type="Label" parent="Scroll/Margin/Layout/DailyRewardCard/RewardPadding/RewardContent/RewardCopy"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("bold_font")
+theme_override_colors/font_color = Color(0.75, 0.17, 0.18, 1)
+theme_override_font_sizes/font_size = 18
+text = "Daily Reward Ready"
+
+[node name="RewardSubtitle" type="Label" parent="Scroll/Margin/Layout/DailyRewardCard/RewardPadding/RewardContent/RewardCopy"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.45, 0.37, 0.27, 1)
+theme_override_font_sizes/font_size = 14
+text = "Claim 10 coins now"
+
+[node name="RewardArrow" type="Label" parent="Scroll/Margin/Layout/DailyRewardCard/RewardPadding/RewardContent"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("bold_font")
+theme_override_colors/font_color = Color(0.75, 0.17, 0.18, 1)
+theme_override_font_sizes/font_size = 22
+text = "›"
+vertical_alignment = 1
+
+[node name="ActionSpacer" type="Control" parent="Scroll/Margin/Layout"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="ActionBox" type="Control" parent="Scroll/Margin/Layout"]
+custom_minimum_size = Vector2(0, 370)
+layout_mode = 2
+
+[node name="ActionPanel" type="PanelContainer" parent="Scroll/Margin/Layout/ActionBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_styles/panel = ExtResource("card")
+
+[node name="Actions" type="VBoxContainer" parent="Scroll/Margin/Layout/ActionBox/ActionPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="DifficultyModeButton" type="Button" parent="Scroll/Margin/Layout/ActionBox/ActionPanel/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("bold_font")
+size_flags_horizontal = 3
+theme_override_styles/normal = ExtResource("blue")
+theme_override_styles/hover = ExtResource("blue")
+theme_override_styles/pressed = ExtResource("blue")
+theme_override_colors/font_color = Color(1, 0.95, 0.7, 1)
+theme_override_font_sizes/font_size = 17
+text = "🎮 MODE: 👶 CHILD (EASY) • TAP TO CHANGE"
+
+[node name="PlayButton" type="Button" parent="Scroll/Margin/Layout/ActionBox/ActionPanel/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 112)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("heading_font")
+size_flags_horizontal = 3
+theme_override_styles/normal = ExtResource("blue")
+theme_override_styles/hover = ExtResource("blue")
+theme_override_styles/pressed = ExtResource("blue")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 42
+text = "PLAY"
+
+[node name="DailyChallengeButton" type="Button" parent="Scroll/Margin/Layout/ActionBox/ActionPanel/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = ExtResource("blue")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "DAILY CHALLENGE"
+
+[node name="RewardedButton" type="Button" parent="Scroll/Margin/Layout/ActionBox/ActionPanel/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = ExtResource("blue")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "▶  Watch Ad  •  Get 100 Coins"
+
+[node name="Nav" type="HBoxContainer" parent="Scroll/Margin/Layout/ActionBox/ActionPanel/Actions"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ShopButton" type="Button" parent="Scroll/Margin/Layout/ActionBox/ActionPanel/Actions/Nav"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="StoreButton" type="Button" parent="Scroll/Margin/Layout/ActionBox/ActionPanel/Actions/Nav"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="MissionsButton" type="Button" parent="Scroll/Margin/Layout/ActionBox/ActionPanel/Actions/Nav"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ScoreButton" type="Button" parent="Scroll/Margin/Layout/ActionBox/ActionPanel/Actions/Nav"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="FooterSpacer" type="Control" parent="Scroll/Margin/Layout/ActionBox/ActionPanel/Actions"]
+visible = false
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+
+[node name="MessageLabel" type="Label" parent="Scroll/Margin/Layout/ActionBox/ActionPanel/Actions"]
+visible = false
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 0.2, 0.3, 1)
+theme_override_font_sizes/font_size = 15
+text = "Complete missions to earn coins"
+horizontal_alignment = 1
+autowrap_mode = 3
+

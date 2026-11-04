@@ -1,0 +1,134 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/privacy_dialog.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/smash/notice_paper.png" id="2_paper"]
+[ext_resource type="Texture2D" path="res://assets/smash/monster_peek.png" id="3_monster"]
+[ext_resource type="FontVariation" path="res://resources/ui_heading_font.tres" id="4_head"]
+[ext_resource type="FontVariation" path="res://resources/ui_bold_font.tres" id="5_bold"]
+
+[node name="PrivacyDialog" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+z_index = 500
+script = ExtResource("1_script")
+
+[node name="Dimmer" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.12, 0.16, 0.78)
+
+[node name="CenterBox" type="Control" parent="Dimmer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -240.0
+offset_right = 220.0
+offset_bottom = 240.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MonsterPeek" type="TextureRect" parent="Dimmer/CenterBox"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -70.0
+offset_top = -30.0
+offset_right = 70.0
+offset_bottom = 90.0
+grow_horizontal = 2
+texture = ExtResource("3_monster")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PaperBg" type="NinePatchRect" parent="Dimmer/CenterBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 40.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_paper")
+patch_margin_left = 40
+patch_margin_top = 55
+patch_margin_right = 40
+patch_margin_bottom = 60
+
+[node name="Margin" type="MarginContainer" parent="Dimmer/CenterBox/PaperBg"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 36
+theme_override_constants/margin_top = 45
+theme_override_constants/margin_right = 36
+theme_override_constants/margin_bottom = 75
+
+[node name="VBox" type="VBoxContainer" parent="Dimmer/CenterBox/PaperBg/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Title" type="Label" parent="Dimmer/CenterBox/PaperBg/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.18, 0.18, 0.22, 1)
+theme_override_fonts/font = ExtResource("4_head")
+theme_override_font_sizes/font_size = 36
+text = "Welcome!"
+horizontal_alignment = 1
+
+[node name="Underline" type="ColorRect" parent="Dimmer/CenterBox/PaperBg/Margin/VBox"]
+custom_minimum_size = Vector2(160, 3)
+layout_mode = 2
+size_flags_horizontal = 4
+color = Color(0.38, 0.65, 0.95, 1)
+
+[node name="Spacer" type="Control" parent="Dimmer/CenterBox/PaperBg/Margin/VBox"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="BodyText" type="RichTextLabel" parent="Dimmer/CenterBox/PaperBg/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/default_color = Color(0.18, 0.18, 0.22, 1)
+theme_override_fonts/bold_font = ExtResource("5_bold")
+theme_override_font_sizes/normal_font_size = 20
+theme_override_font_sizes/bold_font_size = 20
+bbcode_enabled = true
+text = "[center]By continuing to play, you confirm you agree to our [color=#2196f3][b]Terms[/b][/color] and [color=#2196f3][b]Privacy Policy[/b][/color].[/center]"
+fit_content = true
+autowrap_mode = 2
+
+[node name="ContinueButton" type="Button" parent="Dimmer/CenterBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(230, 58)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -115.0
+offset_top = -46.0
+offset_right = 115.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("5_bold")
+theme_override_font_sizes/font_size = 24
+text = "Continue"

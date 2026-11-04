@@ -1,0 +1,514 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/smash/smash_game.gd" id="1_game"]
+[ext_resource type="Script" path="res://scripts/smash/drawing_canvas.gd" id="2_canvas"]
+[ext_resource type="Texture2D" path="res://assets/generated/victory-star.png" id="3_star"]
+[ext_resource type="FontVariation" path="res://resources/ui_bold_font.tres" id="4_bold"]
+[ext_resource type="FontVariation" path="res://resources/ui_heading_font.tres" id="5_head"]
+[ext_resource type="Texture2D" path="res://assets/generated/reward-coin.png" id="6_coin"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fail"]
+bg_color = Color(0.18, 0.12, 0.14, 0.96)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.92, 0.35, 0.35, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_size = 12
+shadow_offset = Vector2(0, 8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_coin_pill"]
+bg_color = Color(0.12, 0.16, 0.22, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.78, 0.22, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.2)
+shadow_size = 4
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pill"]
+bg_color = Color(0.97, 0.94, 0.86, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.1)
+shadow_size = 4
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vic"]
+bg_color = Color(0.12, 0.15, 0.22, 0.96)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.95, 0.78, 0.22, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_size = 12
+shadow_offset = Vector2(0, 8)
+
+[node name="SmashGame" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_game")
+
+[node name="BackgroundSky" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.89, 0.92, 0.96, 1)
+
+[node name="CitySilhouette" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -420.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(0.84, 0.87, 0.92, 0.45)
+
+[node name="WorldContainer" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="PlatformsContainer" type="Node2D" parent="WorldContainer"]
+unique_name_in_owner = true
+
+[node name="BugsContainer" type="Node2D" parent="WorldContainer"]
+unique_name_in_owner = true
+
+[node name="CanvasHolder" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 166.0
+offset_bottom = 416.0
+grow_horizontal = 2
+
+[node name="DrawingCanvas" type="Control" parent="CanvasHolder"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -120.0
+offset_right = 250.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_canvas")
+
+[node name="PreviewLine" type="Line2D" parent="CanvasHolder/DrawingCanvas"]
+width = 14.0
+default_color = Color(0.1, 0.1, 0.1, 1)
+
+[node name="TopBar" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 158.0
+grow_horizontal = 2
+
+[node name="RestartBtn" type="Button" parent="TopBar"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 24.0
+offset_top = 40.0
+offset_right = 80.0
+offset_bottom = 96.0
+theme_override_font_sizes/font_size = 28
+text = "🔄"
+
+[node name="MenuBtn" type="Button" parent="TopBar"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 88.0
+offset_top = 40.0
+offset_right = 144.0
+offset_bottom = 96.0
+theme_override_font_sizes/font_size = 28
+text = "🏠"
+
+[node name="TopCoinPill" type="PanelContainer" parent="TopBar"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -140.0
+offset_top = 40.0
+offset_right = -18.0
+offset_bottom = 90.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_coin_pill")
+
+[node name="Margin" type="MarginContainer" parent="TopBar/TopCoinPill"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 2
+
+[node name="HBox" type="HBoxContainer" parent="TopBar/TopCoinPill/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="TopCoinIcon" type="TextureRect" parent="TopBar/TopCoinPill/Margin/HBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("6_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TopCoinLabel" type="Label" parent="TopBar/TopCoinPill/Margin/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.45, 1)
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 20
+text = "0"
+vertical_alignment = 1
+
+[node name="HintBtn" type="Button" parent="TopBar"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -80.0
+offset_top = 40.0
+offset_right = -24.0
+offset_bottom = 96.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 28
+text = "💡"
+
+[node name="LevelPill" type="PanelContainer" parent="TopBar"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -90.0
+offset_top = 40.0
+offset_right = 90.0
+offset_bottom = 90.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pill")
+
+[node name="LevelLabel" type="Label" parent="TopBar/LevelPill"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.24, 0.2, 0.15, 1)
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 24
+text = "Level 1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ModeBtn" type="Button" parent="TopBar"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -80.0
+offset_top = 96.0
+offset_right = 80.0
+offset_bottom = 126.0
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_coin_pill")
+text = "👶 Child Mode"
+
+[node name="ObjectiveLabel" type="Label" parent="TopBar"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -220.0
+offset_top = 130.0
+offset_right = 220.0
+offset_bottom = 156.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.35, 0.4, 0.48, 1)
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 15
+text = "🎯 Smash Bad Bugs! | 🐝 Protect Friendly Bees!"
+horizontal_alignment = 1
+
+[node name="HintLabel" type="Label" parent="TopBar"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -240.0
+offset_top = 118.0
+offset_right = 240.0
+offset_bottom = 142.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.85, 0.48, 0.12, 1)
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 13
+text = "💡 Hint: Draw an L-Hook to reach the fly!"
+horizontal_alignment = 1
+
+[node name="InkBar" type="ProgressBar" parent="TopBar"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -14.0
+offset_right = -24.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 0
+value = 100.0
+show_percentage = false
+
+[node name="VictoryPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -180.0
+offset_right = 200.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_vic")
+
+[node name="VBox" type="VBoxContainer" parent="VictoryPanel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="VictoryTitle" type="Label" parent="VictoryPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.88, 0.32, 1)
+theme_override_fonts/font = ExtResource("5_head")
+theme_override_font_sizes/font_size = 32
+text = "LEVEL CLEARED!"
+horizontal_alignment = 1
+
+[node name="StarsHBox" type="HBoxContainer" parent="VictoryPanel/VBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="Star1" type="TextureRect" parent="VictoryPanel/VBox/StarsHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+texture = ExtResource("3_star")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Star2" type="TextureRect" parent="VictoryPanel/VBox/StarsHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+texture = ExtResource("3_star")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Star3" type="TextureRect" parent="VictoryPanel/VBox/StarsHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+texture = ExtResource("3_star")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CoinsReward" type="Label" parent="VictoryPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 20
+text = "+25 COINS"
+horizontal_alignment = 1
+
+[node name="NextLevelBtn" type="Button" parent="VictoryPanel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 22
+text = "NEXT LEVEL ➔"
+
+[node name="FailPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -160.0
+offset_right = 200.0
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_fail")
+
+[node name="VBox" type="VBoxContainer" parent="FailPanel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="FailTitle" type="Label" parent="FailPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.32, 0.32, 1)
+theme_override_fonts/font = ExtResource("5_head")
+theme_override_font_sizes/font_size = 30
+text = "LEVEL FAILED! 💔"
+horizontal_alignment = 1
+
+[node name="FailMessage" type="Label" parent="FailPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.92, 0.95, 1)
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 18
+text = "Friendly Bee was harmed!\nOnly smash bad flies!"
+horizontal_alignment = 1
+
+[node name="TryAgainBtn" type="Button" parent="FailPanel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 20
+text = "RETRY (10 COINS) 🔄"
+
+[node name="WatchAdBtn" type="Button" parent="FailPanel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 19
+text = "WATCH AD (+10 🟡)"
+
+[node name="ModeDialog" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -220.0
+offset_right = 220.0
+offset_bottom = 220.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_vic")
+
+[node name="VBox" type="VBoxContainer" parent="ModeDialog"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="ModeDialogTitle" type="Label" parent="ModeDialog/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.88, 0.32, 1)
+theme_override_fonts/font = ExtResource("5_head")
+theme_override_font_sizes/font_size = 28
+text = "LEVEL CLEARED! 🌟"
+horizontal_alignment = 1
+
+[node name="ModeDialogSubtitle" type="Label" parent="ModeDialog/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 16
+text = "Choose Difficulty For Next Levels:"
+horizontal_alignment = 1
+
+[node name="ChildModeBtn" type="Button" parent="ModeDialog/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(340, 54)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 17
+text = "👶 Child Mode (Easy • Extra Ink)"
+
+[node name="AdultModeBtn" type="Button" parent="ModeDialog/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(340, 54)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 17
+text = "🧑 Medium Mode (Normal)"
+
+[node name="HardModeBtn" type="Button" parent="ModeDialog/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(340, 54)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 17
+text = "🔥 Hard Mode (Fast Bugs • Tight Ink)"
+
+[node name="ModeContinueBtn" type="Button" parent="ModeDialog/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 19
+text = "CONTINUE PLAYING ➔"
