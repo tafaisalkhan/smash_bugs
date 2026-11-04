@@ -7,16 +7,56 @@ signal daily_reward_requested
 signal rewarded_coins_requested
 
 func _ready() -> void:
-	%SettingsButton.pressed.connect(func(): screen_requested.emit("settings"))
-	%ScoreLink.pressed.connect(func(): screen_requested.emit("leaderboard"))
-	%PlayButton.pressed.connect(func(): play_requested.emit())
-	%DailyChallengeButton.pressed.connect(func(): daily_challenge_requested.emit())
-	%DailyRewardButton.pressed.connect(func(): daily_reward_requested.emit())
-	%RewardedButton.pressed.connect(func(): rewarded_coins_requested.emit())
-	%ShopButton.pressed.connect(func(): screen_requested.emit("shop"))
-	%StoreButton.pressed.connect(func(): screen_requested.emit("store"))
-	%MissionsButton.pressed.connect(func(): screen_requested.emit("missions"))
-	%ScoreButton.pressed.connect(func(): screen_requested.emit("leaderboard"))
+	%SettingsButton.pressed.connect(func():
+		var audio = get_node_or_null("/root/AudioManager")
+		if audio and audio.has_method("play_button"): audio.play_button()
+		screen_requested.emit("settings")
+	)
+	%ScoreLink.pressed.connect(func():
+		var audio = get_node_or_null("/root/AudioManager")
+		if audio and audio.has_method("play_button"): audio.play_button()
+		screen_requested.emit("leaderboard")
+	)
+	%PlayButton.pressed.connect(func():
+		var audio = get_node_or_null("/root/AudioManager")
+		if audio and audio.has_method("play_button"): audio.play_button()
+		play_requested.emit()
+	)
+	%DailyChallengeButton.pressed.connect(func():
+		var audio = get_node_or_null("/root/AudioManager")
+		if audio and audio.has_method("play_button"): audio.play_button()
+		daily_challenge_requested.emit()
+	)
+	%DailyRewardButton.pressed.connect(func():
+		var audio = get_node_or_null("/root/AudioManager")
+		if audio and audio.has_method("play_button"): audio.play_button()
+		daily_reward_requested.emit()
+	)
+	%RewardedButton.pressed.connect(func():
+		var audio = get_node_or_null("/root/AudioManager")
+		if audio and audio.has_method("play_button"): audio.play_button()
+		rewarded_coins_requested.emit()
+	)
+	%ShopButton.pressed.connect(func():
+		var audio = get_node_or_null("/root/AudioManager")
+		if audio and audio.has_method("play_button"): audio.play_button()
+		screen_requested.emit("shop")
+	)
+	%StoreButton.pressed.connect(func():
+		var audio = get_node_or_null("/root/AudioManager")
+		if audio and audio.has_method("play_button"): audio.play_button()
+		screen_requested.emit("store")
+	)
+	%MissionsButton.pressed.connect(func():
+		var audio = get_node_or_null("/root/AudioManager")
+		if audio and audio.has_method("play_button"): audio.play_button()
+		screen_requested.emit("missions")
+	)
+	%ScoreButton.pressed.connect(func():
+		var audio = get_node_or_null("/root/AudioManager")
+		if audio and audio.has_method("play_button"): audio.play_button()
+		screen_requested.emit("leaderboard")
+	)
 	if has_node("%DifficultyModeButton"):
 		_update_mode_button()
 		%DifficultyModeButton.pressed.connect(_on_mode_button_pressed)
@@ -37,6 +77,8 @@ func _update_mode_button() -> void:
 			%DifficultyModeButton.text = "🎮 DIFFICULTY: 🟢 EASY • TAP TO CHANGE"
 
 func _on_mode_button_pressed() -> void:
+	var audio = get_node_or_null("/root/AudioManager")
+	if audio and audio.has_method("play_button"): audio.play_button()
 	var state = get_node_or_null("/root/GameState")
 	if state and state.has_method("set_difficulty"):
 		var next_diff: int = (int(state.difficulty_index) + 1) % 3
