@@ -54,8 +54,28 @@ func _render_settings() -> void:
 	var actions: Array = _data.get("settings_actions", [])
 	if not actions.is_empty():
 		var action: Dictionary = actions[0]
-		_label("MORE SETTINGS", Rect2(0.15, 0.54, 0.53, 0.06), 21, Color("#124647"), false)
-		_hotspot(Rect2(0.13, 0.53, 0.75, 0.09), Callable(self, "_action").bind(str(action.get("id", ""))))
+		var action_label := str(action.get("label", "REMOVE ADS")).to_upper()
+		var btn_text := str(action.get("button_text", "$4.99")).to_upper()
+		var btn_color: Color = action.get("button_color", Color("#ff9800"))
+		var remove_btn := Button.new()
+		_place(remove_btn, Rect2(0.14, 0.535, 0.72, 0.08))
+		remove_btn.text = "%s  •  %s" % [action_label, btn_text] if not btn_text.is_empty() else action_label
+		remove_btn.add_theme_font_override("font", OVERLAY_FONT)
+		remove_btn.add_theme_font_size_override("font_size", 20)
+		remove_btn.add_theme_color_override("font_color", Color.WHITE)
+		var style := StyleBoxFlat.new()
+		style.bg_color = btn_color
+		style.corner_radius_top_left = 14
+		style.corner_radius_top_right = 14
+		style.corner_radius_bottom_left = 14
+		style.corner_radius_bottom_right = 14
+		style.border_width_bottom = 4
+		style.border_color = btn_color.darkened(0.3)
+		remove_btn.add_theme_stylebox_override("normal", style)
+		remove_btn.add_theme_stylebox_override("hover", style)
+		remove_btn.add_theme_stylebox_override("pressed", style)
+		remove_btn.pressed.connect(Callable(self, "_action").bind(str(action.get("id", "remove_ads"))))
+		add_child(remove_btn)
 	_label("PRIVACY", Rect2(0.34, 0.77, 0.32, 0.05), 19, Color("#104449"), true)
 	_hotspot(Rect2(0.34, 0.77, 0.32, 0.05), Callable(self, "_privacy"))
 	_hotspot(Rect2(0.28, 0.66, 0.45, 0.11), Callable(self, "_close"))

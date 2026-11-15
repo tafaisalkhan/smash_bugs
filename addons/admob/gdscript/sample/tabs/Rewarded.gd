@@ -63,9 +63,9 @@ func _update_ui_state(is_loaded: bool) -> void:
 func _on_load_pressed() -> void:
 	_log("Loading rewarded ad...")
 	var unit_id := (
-		"ca-app-pub-1852108665659812/9548683920"
+		"ca-app-pub-3940256099942544/5224354917"
 		if OS.get_name() == "Android"
-		else "ca-app-pub-1852108665659812/9548683920"
+		else "ca-app-pub-3940256099942544/5224354917"
 	)
 	RewardedAdLoader.new().load(unit_id, AdRequest.new(), _load_callback)
 

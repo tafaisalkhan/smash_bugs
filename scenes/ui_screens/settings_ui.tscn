@@ -38,7 +38,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="FrameBox" type="Control" parent="Center"]
-custom_minimum_size = Vector2(490, 530)
+custom_minimum_size = Vector2(490, 560)
 layout_mode = 2
 
 [node name="Panel" type="PanelContainer" parent="Center/FrameBox"]
@@ -114,7 +114,7 @@ theme_override_styles/normal = ExtResource("light")
 text = "BOOSTS"
 
 [node name="Scroll" type="ScrollContainer" parent="Center/FrameBox/Panel/Layout"]
-custom_minimum_size = Vector2(0, 238)
+custom_minimum_size = Vector2(0, 260)
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0

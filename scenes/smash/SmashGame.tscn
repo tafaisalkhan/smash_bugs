@@ -1,11 +1,11 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/smash/smash_game.gd" id="1_game"]
 [ext_resource type="Script" path="res://scripts/smash/drawing_canvas.gd" id="2_canvas"]
 [ext_resource type="Texture2D" path="res://assets/generated/victory-star.png" id="3_star"]
 [ext_resource type="FontVariation" path="res://resources/ui_bold_font.tres" id="4_bold"]
 [ext_resource type="FontVariation" path="res://resources/ui_heading_font.tres" id="5_head"]
-[ext_resource type="Texture2D" path="res://assets/generated/reward-coin.png" id="6_coin"]
+[ext_resource type="Texture2D" path="res://assets/generated/reward-coin.png" id="6_coin"][ext_resource type="Texture2D" path="res://assets/generated/ui_refresh_icon.svg" id="7_refresh"][ext_resource type="Texture2D" path="res://assets/generated/ui_home_icon.svg" id="8_home"][ext_resource type="Texture2D" path="res://assets/generated/ui_hint_icon.svg" id="9_hint"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fail"]
 bg_color = Color(0.18, 0.12, 0.14, 0.96)
@@ -143,7 +143,7 @@ offset_top = 40.0
 offset_right = 80.0
 offset_bottom = 96.0
 theme_override_font_sizes/font_size = 28
-text = "🔄"
+icon = ExtResource("7_refresh")expand_icon = true
 
 [node name="MenuBtn" type="Button" parent="TopBar"]
 unique_name_in_owner = true
@@ -152,8 +152,7 @@ offset_left = 88.0
 offset_top = 40.0
 offset_right = 144.0
 offset_bottom = 96.0
-theme_override_font_sizes/font_size = 28
-text = "🏠"
+icon = ExtResource("8_home")expand_icon = true
 
 [node name="TopCoinPill" type="PanelContainer" parent="TopBar"]
 unique_name_in_owner = true
@@ -161,10 +160,10 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -140.0
+offset_left = -184.0
 offset_top = 40.0
-offset_right = -18.0
-offset_bottom = 90.0
+offset_right = -96.0
+offset_bottom = 96.0
 grow_horizontal = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_coin_pill")
 
@@ -210,18 +209,17 @@ offset_top = 40.0
 offset_right = -24.0
 offset_bottom = 96.0
 grow_horizontal = 0
-theme_override_font_sizes/font_size = 28
-text = "💡"
+icon = ExtResource("9_hint")expand_icon = true
 
 [node name="LevelPill" type="PanelContainer" parent="TopBar"]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -90.0
+offset_left = -78.0
 offset_top = 40.0
-offset_right = 90.0
-offset_bottom = 90.0
+offset_right = 78.0
+offset_bottom = 96.0
 grow_horizontal = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_pill")
 
@@ -251,6 +249,18 @@ theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_coin_pill")
 text = "👶 Child Mode"
 
+[node name="GlyphDropdown" type="OptionButton" parent="TopBar"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 370.0
+offset_top = 92.0
+offset_right = 522.0
+offset_bottom = 128.0
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 15
+tooltip_text = "Choose a glyph practice puzzle or return to automatic levels"
+text = "Auto levels"
+
 [node name="ObjectiveLabel" type="Label" parent="TopBar"]
 unique_name_in_owner = true
 layout_mode = 1
@@ -258,9 +268,9 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -220.0
-offset_top = 130.0
+offset_top = 108.0
 offset_right = 220.0
-offset_bottom = 156.0
+offset_bottom = 134.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0.35, 0.4, 0.48, 1)
 theme_override_fonts/font = ExtResource("4_bold")

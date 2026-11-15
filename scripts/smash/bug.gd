@@ -22,8 +22,6 @@ var time_passed: float = 0.0
 var _anim_timer: float = 0.0
 var _anim_frame: int = 0
 var _base_scale: Vector2 = Vector2(0.22, 0.22)
-var _splat_particles: CPUParticles2D
-var _celebrate_particles: CPUParticles2D
 var _celebrate_label: Label
 var _phase_offset: float = 0.0
 
@@ -61,7 +59,6 @@ func _ready() -> void:
 		sprite.scale = custom_scale
 		sprite.modulate = custom_modulate
 
-	_create_particles()
 	_create_celebrate_ui()
 
 func _ensure_nodes() -> void:
@@ -72,46 +69,9 @@ func _ensure_nodes() -> void:
 	if not _celebrate_label:
 		_create_celebrate_ui()
 
-func _create_particles() -> void:
-	_splat_particles = CPUParticles2D.new()
-	_splat_particles.emitting = false
-	_splat_particles.one_shot = true
-	_splat_particles.explosiveness = 0.95
-	_splat_particles.amount = 20
-	_splat_particles.lifetime = 0.6
-	_splat_particles.spread = 180.0
-	_splat_particles.initial_velocity_min = 80.0
-	_splat_particles.initial_velocity_max = 160.0
-	_splat_particles.scale_amount_min = 3.0
-	_splat_particles.scale_amount_max = 6.0
-	if kind == "bee":
-		_splat_particles.color = Color(1.0, 0.85, 0.2) # Golden pollen
-	elif kind == "fly":
-		_splat_particles.color = Color(0.2, 0.9, 0.2) # Green goo
-	elif kind == "mosquito":
-		_splat_particles.color = Color(0.92, 0.16, 0.16) # Red blood splat
-	else:
-		_splat_particles.color = Color(0.95, 0.75, 0.1) # Yellow beetle goo
-	add_child(_splat_particles)
-
 func _create_celebrate_ui() -> void:
 	if _celebrate_label:
 		return
-	_celebrate_particles = CPUParticles2D.new()
-	_celebrate_particles.emitting = false
-	_celebrate_particles.one_shot = false
-	_celebrate_particles.explosiveness = 0.4
-	_celebrate_particles.amount = 14
-	_celebrate_particles.lifetime = 0.75
-	_celebrate_particles.direction = Vector2(0, -1)
-	_celebrate_particles.spread = 75.0
-	_celebrate_particles.gravity = Vector2(0, 180)
-	_celebrate_particles.initial_velocity_min = 90.0
-	_celebrate_particles.initial_velocity_max = 150.0
-	_celebrate_particles.scale_amount_min = 3.5
-	_celebrate_particles.scale_amount_max = 6.0
-	_celebrate_particles.color = Color(1.0, 0.84, 0.15)
-	add_child(_celebrate_particles)
 
 	_celebrate_label = Label.new()
 	_celebrate_label.visible = false
@@ -275,8 +235,6 @@ func celebrate() -> void:
 		var idx: int = int(absf(base_position.x + base_position.y)) % TAUNT_TEXTS.size()
 		_celebrate_label.text = TAUNT_TEXTS[idx]
 		_celebrate_label.visible = true
-	if _celebrate_particles:
-		_celebrate_particles.emitting = true
 
 func reset_celebration() -> void:
 	if state != State.CELEBRATE:
@@ -288,8 +246,6 @@ func reset_celebration() -> void:
 		sprite.scale = _base_scale
 	if _celebrate_label:
 		_celebrate_label.visible = false
-	if _celebrate_particles:
-		_celebrate_particles.emitting = false
 
 func _physics_process(_delta: float) -> void:
 	if state == State.DEAD:
@@ -308,6 +264,11 @@ func _on_body_entered(body: Node2D) -> void:
 
 func _try_smash_from_body(body: Node2D) -> void:
 	if state == State.DEAD or not is_instance_valid(body):
+		return
+	if body is CollisionObject2D and (body.collision_layer & collision_mask) == 0:
+		return
+	# A full-screen stroke must move under physics before it can kill a bad bug.
+	if not is_friendly and body is SmashDrawnBody and not body.can_damage_bad_bugs:
 		return
 
 	# Movable level props (stones, boulders, big shapes, logs):
@@ -329,8 +290,6 @@ func smash() -> void:
 	state = State.DEAD
 	if _celebrate_label:
 		_celebrate_label.visible = false
-	if _celebrate_particles:
-		_celebrate_particles.emitting = false
 	if sprite:
 		sprite.rotation = 0.0
 		sprite.scale = _base_scale
@@ -341,9 +300,6 @@ func smash() -> void:
 	_play_death_sequence()
 
 func _play_death_sequence() -> void:
-	if _splat_particles:
-		_splat_particles.restart()
-
 	# Play bug kill splat audio
 	if is_inside_tree():
 		var audio = get_node_or_null("/root/AudioManager")

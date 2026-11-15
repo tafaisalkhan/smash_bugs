@@ -2,7 +2,7 @@ class_name SmashPlatform
 extends StaticBody2D
 
 @export var size: Vector2 = Vector2(200, 50)
-@export var style: String = "brick" # "brick", "stone", "moss_stone", "wood_log", "mushroom_bouncy", "flower_pedestal"
+@export var style: String = "brick" # "brick", "blue_brick", "stone", "moss_stone", "wood_log", "mushroom_bouncy", "flower_pedestal"
 
 var collision_shape: CollisionShape2D
 
@@ -36,6 +36,8 @@ func _draw() -> void:
 	match style:
 		"brick":
 			_draw_brick(r)
+		"blue_brick":
+			_draw_blue_brick(r)
 		"stone":
 			_draw_stone(r)
 		"moss_stone":
@@ -50,14 +52,14 @@ func _draw() -> void:
 			_draw_brick(r)
 
 func _draw_brick(r: Rect2) -> void:
-	# 1. Main blue brick fill
-	draw_rect(r, Color("#2b7cd3")) # Vibrant stylized blue brick base
+	# Warm brickwork used by the city puzzle stages.
+	draw_rect(r, Color("#e97857"))
 
 	# 2. Mortar lines and individual bricks
 	var brick_h := 16.0
 	var brick_w := 34.0
-	var mortar_color := Color("#d6e9ff") # Clean ice-blue mortar
-	var shadow_color := Color("#1a5296") # Deep blue shadow
+	var mortar_color := Color("#ffe0ca")
+	var shadow_color := Color("#b74a38")
 
 	var rows := int(ceil(size.y / brick_h))
 	for row in range(rows):
@@ -77,11 +79,33 @@ func _draw_brick(r: Rect2) -> void:
 	# 3. Top concrete ledge cap
 	var cap_h := 10.0
 	var cap_rect := Rect2(r.position.x - 2, r.position.y, size.x + 4, cap_h)
-	draw_rect(cap_rect, Color("#1f5ca8")) # Rich slate-blue cap stone
-	draw_rect(Rect2(r.position.x - 2, r.position.y, size.x + 4, 3), Color("#62a8ff")) # Cap bright blue highlight
+	draw_rect(cap_rect, Color("#bf503d"))
+	draw_rect(Rect2(r.position.x - 2, r.position.y, size.x + 4, 3), Color("#ffad81"))
 
 	# 4. Outer border outline
-	draw_rect(r, Color("#0d2847"), false, 2.5) # Dark midnight blue outline
+	draw_rect(r, Color("#81372e"), false, 2.5)
+
+func _draw_blue_brick(r: Rect2) -> void:
+	# Cool blue brickwork used by the original puzzle set.
+	draw_rect(r, Color("#3d78b5"))
+	var brick_h := 16.0
+	var brick_w := 34.0
+	var mortar_color := Color("#c9e8ff")
+	var shadow_color := Color("#24527f")
+	var rows := int(ceil(size.y / brick_h))
+	for row in range(rows):
+		var y := r.position.y + float(row) * brick_h
+		draw_line(Vector2(r.position.x, y), Vector2(r.end.x, y), mortar_color, 2.0)
+		var x_offset := (brick_w * 0.5) if (row % 2 == 1) else 0.0
+		var x := r.position.x + x_offset
+		while x < r.end.x:
+			draw_line(Vector2(x, y), Vector2(x, min(y + brick_h, r.end.y)), mortar_color, 2.0)
+			draw_line(Vector2(x + 2, y + brick_h - 1), Vector2(min(x + brick_w - 2, r.end.x), y + brick_h - 1), shadow_color, 1.5)
+			x += brick_w
+	var cap_h := 10.0
+	draw_rect(Rect2(r.position.x - 2, r.position.y, size.x + 4, cap_h), Color("#2f6297"))
+	draw_rect(Rect2(r.position.x - 2, r.position.y, size.x + 4, 3), Color("#91cdf5"))
+	draw_rect(r, Color("#183d63"), false, 2.5)
 
 func _draw_stone(r: Rect2) -> void:
 	draw_rect(r, Color("#6d7a82"))

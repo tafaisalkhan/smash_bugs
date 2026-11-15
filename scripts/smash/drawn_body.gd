@@ -3,8 +3,12 @@ extends RigidBody2D
 
 @export var stroke_width: float = 14.0
 @export var stroke_color: Color = Color("#181818")
+@export_range(0.0, 1.0) var rubber_bounce: float = 0.92
+@export_range(0.0, 1.0) var surface_friction: float = 0.05
 
 var line: Line2D
+var spawn_center := Vector2.ZERO
+var can_damage_bad_bugs := false
 
 func build_from_points(global_pts: PackedVector2Array) -> void:
 	if global_pts.size() < 2:
@@ -18,6 +22,8 @@ func build_from_points(global_pts: PackedVector2Array) -> void:
 	center /= float(global_pts.size())
 
 	global_position = center
+	spawn_center = center
+	can_damage_bad_bugs = false
 
 	# Create local points relative to body center
 	var local_pts := PackedVector2Array()
@@ -62,10 +68,16 @@ func build_from_points(global_pts: PackedVector2Array) -> void:
 	continuous_cd = RigidBody2D.CCD_MODE_CAST_RAY
 
 	var phys_mat := PhysicsMaterial.new()
-	phys_mat.friction = 0.22
-	phys_mat.bounce = 0.18
+	# The selected material controls how much momentum this drawn item keeps
+	# or returns on contact with balls and other physics props.
+	phys_mat.friction = surface_friction
+	phys_mat.bounce = rubber_bounce
 	physics_material_override = phys_mat
 
 	# Collision layer: 2 (drawn shapes), mask: 1 (platforms) + 2 (movable stones/props) + 4 (bugs)
 	collision_layer = 2
 	collision_mask = 1 | 2 | 4
+
+func _physics_process(_delta: float) -> void:
+	if not can_damage_bad_bugs and global_position.distance_to(spawn_center) >= 48.0:
+		can_damage_bad_bugs = true

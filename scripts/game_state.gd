@@ -4,9 +4,10 @@ const SAVE_PATH := "user://math_mind_progress.cfg"
 const SAVE_VERSION := 2
 
 var highest_level: int = 1
-var highest_levels: Array[int] = [1, 0, 0, 0]
+var highest_levels: Array[int] = [1, 1, 0, 0]
 var last_selected_levels: Array[int] = [1, 1, 1, 1]
 var coins: int = 0
+var elastic_ink: int = 1000
 var total_stars: int = 0
 var win_streak: int = 0
 var games_played: int = 0
@@ -29,12 +30,16 @@ var ads_removed: bool = false
 var daily_notifications: bool = true
 var privacy_accepted: bool = false
 var show_privacy_on_start: bool = false
-var difficulty_index: int = 0 # 0: Easy, 1: Medium, 2: Hard
-var player_mode: String = "child" # "child" (Easy) or "adult" (Medium/Hard)
+var difficulty_index: int = 1 # 0: Easy, 1: Medium, 2: Hard
+const DIFFICULTY_LEVEL_STARTS := [1, 101, 201]
+var player_mode: String = "adult" # "child" (Easy) or "adult" (Medium/Hard)
 const DIFFICULTY_NAMES: Array[String] = ["Easy", "Medium", "Hard"]
 
 func _ready() -> void:
 	load_progress()
+	_sync_daily_reward_notifications()
+	if daily_notifications and OS.get_name() == "Android":
+		OS.request_permissions()
 
 func load_progress() -> void:
 	var config := ConfigFile.new()
@@ -51,6 +56,7 @@ func load_progress() -> void:
 		return
 	highest_level = int(config.get_value("progress", "highest_level", 1))
 	coins = int(config.get_value("progress", "coins", 0))
+	elastic_ink = maxi(0, int(config.get_value("progress", "elastic_ink", 1000)))
 	total_stars = int(config.get_value("progress", "total_stars", 0))
 	win_streak = int(config.get_value("progress", "win_streak", 0))
 	games_played = int(config.get_value("progress", "games_played", 0))
@@ -83,23 +89,22 @@ func load_progress() -> void:
 	privacy_accepted = bool(config.get_value("privacy", "accepted", false))
 	show_privacy_on_start = bool(config.get_value("privacy", "show_on_start", false))
 	difficulty_index = clampi(int(config.get_value("settings", "difficulty_index", 0)), 0, 2)
-	player_mode = str(config.get_value("settings", "player_mode", "child"))
+	player_mode = "child" if difficulty_index == 0 else "adult"
 	highest_levels = [
 		int(config.get_value("progress", "highest_easy", highest_level)),
-		int(config.get_value("progress", "highest_medium", 0)),
-		int(config.get_value("progress", "highest_hard", 0)),
-		int(config.get_value("progress", "highest_expert", 0))
+		int(config.get_value("progress", "highest_medium", 101)),
+		int(config.get_value("progress", "highest_hard", 201)),
+		int(config.get_value("progress", "highest_expert", 301))
 	]
 	last_selected_levels = [
 		int(config.get_value("progress", "last_easy", 1)),
-		int(config.get_value("progress", "last_medium", 1)),
-		int(config.get_value("progress", "last_hard", 1)),
-		int(config.get_value("progress", "last_expert", 1))
+		int(config.get_value("progress", "last_medium", 101)),
+		int(config.get_value("progress", "last_hard", 201)),
+		int(config.get_value("progress", "last_expert", 301))
 	]
-	if not is_difficulty_unlocked(difficulty_index):
-		difficulty_index = 0
-	highest_level = maxi(1, highest_levels[difficulty_index])
-	requested_level = clampi(last_selected_levels[difficulty_index], 1, mini(highest_level, 1000))
+	var first_level: int = int(DIFFICULTY_LEVEL_STARTS[clampi(difficulty_index, 0, DIFFICULTY_LEVEL_STARTS.size() - 1)])
+	highest_level = maxi(first_level, highest_levels[difficulty_index])
+	requested_level = clampi(last_selected_levels[difficulty_index], first_level, highest_level)
 
 func save_progress() -> void:
 	var config := ConfigFile.new()
@@ -115,6 +120,7 @@ func save_progress() -> void:
 	config.set_value("progress", "last_hard", last_selected_levels[2])
 	config.set_value("progress", "last_expert", last_selected_levels[3])
 	config.set_value("progress", "coins", coins)
+	config.set_value("progress", "elastic_ink", elastic_ink)
 	config.set_value("progress", "total_stars", total_stars)
 	config.set_value("progress", "win_streak", win_streak)
 	config.set_value("progress", "games_played", games_played)
@@ -138,6 +144,14 @@ func save_progress() -> void:
 	config.set_value("settings", "difficulty_index", difficulty_index)
 	config.set_value("settings", "player_mode", player_mode)
 	config.save(SAVE_PATH)
+	_sync_daily_reward_notifications()
+
+func _sync_daily_reward_notifications() -> void:
+	if OS.get_name() != "Android":
+		return
+	var activity_class = JavaClassWrapper.wrap("com/godot/game/GodotApp")
+	if activity_class:
+		activity_class.setDailyRewardNotifications(daily_notifications)
 
 func unlocked_chapter() -> int:
 	return maxi(1, int((highest_level - 1) / 10) + 1)
@@ -149,9 +163,12 @@ func daily_level() -> int:
 func start_mode(mode: String) -> void:
 	game_mode = mode
 	match mode:
-		"daily": requested_level = daily_level()
+		"daily":
+			difficulty_index = 0
+			player_mode = "child"
+			requested_level = 1
 		"endless": requested_level = maxi(highest_level, 11)
-		_: requested_level = clampi(last_selected_levels[difficulty_index], 1, mini(highest_level, 1000))
+		_: requested_level = clampi(last_selected_levels[difficulty_index], int(DIFFICULTY_LEVEL_STARTS[difficulty_index]), maxi(highest_level, int(DIFFICULTY_LEVEL_STARTS[difficulty_index])))
 
 func start_game_type(type_index: int) -> void:
 	game_mode = "selected"
@@ -187,8 +204,9 @@ func set_difficulty(index: int) -> bool:
 		return false
 	highest_levels[difficulty_index] = maxi(highest_levels[difficulty_index], highest_level)
 	difficulty_index = index
-	highest_level = maxi(1, highest_levels[index])
-	requested_level = clampi(last_selected_levels[index], 1, mini(highest_level, 1000))
+	var first_level: int = int(DIFFICULTY_LEVEL_STARTS[index])
+	highest_level = maxi(first_level, highest_levels[index])
+	requested_level = clampi(last_selected_levels[index], first_level, maxi(highest_level, first_level))
 	if index == 0:
 		player_mode = "child"
 	else:

@@ -3,17 +3,26 @@ extends Control
 
 signal stroke_started
 signal stroke_completed(points: PackedVector2Array)
+signal ink_depleted(ink_type: String)
 
 @export var max_ink: float = 1000.0
 @export var max_strokes: int = 1
 @export var stroke_width: float = 14.0
 @export var stroke_color: Color = Color("#111111")
+var show_paper: bool = true
 
 var is_drawing: bool = false
 var is_locked: bool = false
 var strokes_used: int = 0
 var points: PackedVector2Array = PackedVector2Array()
 var used_ink: float = 0.0
+var stroke_ink: float = 0.0
+var normal_max_ink: float = 1000.0
+var elastic_max_ink: float = 0.0
+var normal_used_ink: float = 0.0
+var elastic_used_ink: float = 0.0
+var active_ink_type := "normal"
+var use_elastic_ink := false
 
 var hint_points: PackedVector2Array = PackedVector2Array()
 var is_hint_visible: bool = false
@@ -54,13 +63,54 @@ func reset_canvas() -> void:
 	is_locked = false
 	strokes_used = 0
 	points.clear()
+	stroke_ink = 0.0
 	if not preview_line:
 		preview_line = get_node_or_null("PreviewLine")
 	if is_instance_valid(preview_line):
 		preview_line.clear_points()
 	used_ink = 0.0
+	normal_used_ink = 0.0
+	elastic_used_ink = 0.0
 	_update_canvas_status_label()
 	queue_redraw()
+
+func set_ink_budgets(normal_amount: float, elastic_amount: float) -> void:
+	normal_max_ink = maxf(normal_amount, 0.0)
+	use_elastic_ink = false
+	elastic_max_ink = maxf(elastic_amount, 0.0)
+	max_ink = normal_max_ink + elastic_max_ink
+	normal_used_ink = 0.0
+	elastic_used_ink = 0.0
+	used_ink = 0.0
+
+func set_active_ink_type(ink_type: String) -> void:
+	active_ink_type = "elastic" if ink_type == "elastic" else "normal"
+	use_elastic_ink = active_ink_type == "elastic"
+	# Both materials draw with the same visible black preview. Their ink
+	# balances remain independent; Elastic changes the body after release.
+	stroke_color = Color("#111111")
+	if is_instance_valid(preview_line):
+		preview_line.default_color = stroke_color
+		preview_line.modulate = Color.WHITE
+	# Each material is independently drawable. Never carry an old stroke lock
+	# from Solid into Elastic (or vice versa).
+	if not is_drawing:
+		is_locked = false
+		strokes_used = 0
+		max_strokes = maxi(max_strokes, 999)
+
+func remaining_ink(ink_type: String) -> float:
+	if ink_type == "elastic":
+		return maxf(elastic_max_ink - elastic_used_ink, 0.0)
+	return maxf(normal_max_ink - normal_used_ink, 0.0)
+
+func add_elastic_ink(amount: float) -> void:
+	elastic_max_ink += maxf(amount, 0.0)
+	max_ink = normal_max_ink + elastic_max_ink
+
+func commit_elastic_stroke() -> void:
+	# Kept for the game callback; Elastic ink is charged while drawing.
+	pass
 
 func _update_canvas_status_label() -> void:
 	var lbl: Label = get_node_or_null("HintLabel")
@@ -87,19 +137,38 @@ func _gui_input(event: InputEvent) -> void:
 	elif event is InputEventScreenDrag and is_drawing:
 		_continue_drawing(event.position)
 
+const MIN_STROKE_LENGTH: float = 15.0
+
 func _start_drawing(pos: Vector2) -> void:
 	if is_locked or strokes_used >= max_strokes:
+		return
+	if remaining_ink(active_ink_type) < MIN_STROKE_LENGTH:
+		ink_depleted.emit(active_ink_type)
 		return
 	if not _is_inside_canvas(pos):
 		return
 
 	is_drawing = true
+	# Apply again at the point of drawing in case the canvas entered the tree
+	# after the material selection was made.
+	preview_line.default_color = Color("#111111")
+	preview_line.modulate = Color.WHITE
 	points.clear()
+	stroke_ink = 0.0
 	points.append(pos)
 	preview_line.clear_points()
 	preview_line.add_point(pos)
-	used_ink = 0.0
 	stroke_started.emit()
+
+func _append_stroke_point(pos: Vector2, dist: float) -> void:
+	if active_ink_type == "elastic":
+		elastic_used_ink += dist
+	else:
+		normal_used_ink += dist
+	used_ink = normal_used_ink + elastic_used_ink
+	stroke_ink += dist
+	points.append(pos)
+	preview_line.add_point(pos)
 
 func _continue_drawing(pos: Vector2) -> void:
 	if not _is_inside_canvas(pos):
@@ -110,12 +179,15 @@ func _continue_drawing(pos: Vector2) -> void:
 
 	# Avoid tiny point clusters (at least 6 pixels between points)
 	if dist >= 6.0:
-		if used_ink + dist <= max_ink:
-			used_ink += dist
-			points.append(pos)
-			preview_line.add_point(pos)
+		var rem := remaining_ink(active_ink_type)
+		if rem >= dist:
+			_append_stroke_point(pos, dist)
 		else:
-			# Ran out of ink! Auto finish
+			# Clamp the final segment to remaining ink so fast drags still draw
+			if rem >= 6.0 or (rem > 0.01 and stroke_ink + rem >= MIN_STROKE_LENGTH):
+				var clamped_pos := last_pt + (pos - last_pt).normalized() * rem
+				if _is_inside_canvas(clamped_pos):
+					_append_stroke_point(clamped_pos, rem)
 			_finish_drawing()
 
 func _finish_drawing() -> void:
@@ -125,7 +197,7 @@ func _finish_drawing() -> void:
 	is_drawing = false
 
 	# Must have at least 2 points and minimum length
-	if points.size() >= 2 and used_ink >= 15.0:
+	if points.size() >= 2 and stroke_ink >= MIN_STROKE_LENGTH:
 		strokes_used += 1
 		if strokes_used >= max_strokes:
 			is_locked = true
@@ -139,7 +211,12 @@ func _finish_drawing() -> void:
 		stroke_completed.emit(global_points)
 	else:
 		# Tiny accidental tap didn't spawn a shape, refund ink
-		used_ink = 0.0
+		if active_ink_type == "elastic":
+			elastic_used_ink = maxf(elastic_used_ink - stroke_ink, 0.0)
+		else:
+			normal_used_ink = maxf(normal_used_ink - stroke_ink, 0.0)
+		used_ink = normal_used_ink + elastic_used_ink
+		stroke_ink = 0.0
 
 	preview_line.clear_points()
 
@@ -151,12 +228,12 @@ func _draw() -> void:
 	var r := Rect2(Vector2.ZERO, size)
 
 	# 1. Background paper (slightly dimmed when stroke is used/locked)
-	var bg_col := Color(0.92, 0.93, 0.95, 0.90) if is_locked else Color(1, 1, 1, 0.95)
+	var bg_col := (Color(0.92, 0.93, 0.95, 0.90) if is_locked else Color(1, 1, 1, 0.95)) if show_paper else Color(1, 1, 1, 0.04)
 	draw_rect(r, bg_col, true)
 
 	# 2. Grid lines
 	var cell_size := 18.0
-	var grid_color := Color(0.85, 0.88, 0.92, 0.75)
+	var grid_color := Color(0.55, 0.58, 0.63, 0.55) if show_paper else Color(0.50, 0.54, 0.60, 0.20)
 
 	var x := cell_size
 	while x < size.x:
@@ -169,7 +246,7 @@ func _draw() -> void:
 		y += cell_size
 
 	# 3. Outer border with reference style dots
-	var border_color := Color(0.78, 0.45, 0.42) if is_locked else Color(0.55, 0.62, 0.72)
+	var border_color := (Color(0.55, 0.50, 0.50) if is_locked else Color(0.20, 0.22, 0.25)) if show_paper else Color(0.20, 0.22, 0.25, 0.50)
 	draw_rect(r, border_color, false, 2.0)
 
 	var dot_spacing := 22.0

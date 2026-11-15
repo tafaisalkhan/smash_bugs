@@ -48,9 +48,9 @@ func _ready() -> void:
 	for index in range(4):
 		var screen: String = ["shop", "store", "missions", "leaderboard"][index]
 		_hotspot(Rect2(0.03 + 0.25 * index, 0.827, 0.22, 0.13), Callable(self, "_open").bind(screen))
-	# The coin capsule also gives access to the daily reward.
-	_hotspot(Rect2(0.7, 0.015, 0.28, 0.07), Callable(self, "_claim_daily"))
-	_label(Rect2(0.7, 0.08, 0.28, 0.027), "DAILY REWARD", 13, Color("#fff0a0"))
+	# Tapping the coin capsule runs a rewarded ad for coins.
+	_hotspot(Rect2(0.7, 0.015, 0.28, 0.07), Callable(self, "_watch_ad"))
+	_label(Rect2(0.7, 0.08, 0.28, 0.027), "WATCH AD", 13, Color("#fff0a0"))
 
 func set_data(data: Dictionary, _title: String, _tagline: String, _score_title: String, _score_unit: String) -> void:
 	if is_instance_valid(_coin_label):

@@ -24,7 +24,7 @@ extends RefCounted
 
 const MEDIATION_PREFIX := "admob/mediation/"
 
-const ANDROID_DEFAULT_APP_ID := "ca-app-pub-1852108665659812~8100669649"
+const ANDROID_DEFAULT_APP_ID := "ca-app-pub-3940256099942544~3347511713"
 const IOS_DEFAULT_APP_ID := "ca-app-pub-3940256099942544~1458002511"
 
 const MEDIATION_LIBS: Array[String] = [

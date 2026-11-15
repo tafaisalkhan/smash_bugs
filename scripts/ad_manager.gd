@@ -2,12 +2,12 @@ extends Node
 ## AdManager - Google AdMob integration (Poing AdMob Plugin v5)
 ## Banner (bottom), Interstitial (on level complete), Rewarded (add tube)
 
-# Google AdMob Ad Unit IDs
-const ADMOB_APP_ID: String = "ca-app-pub-1852108665659812~4812712000"
-const BANNER_AD_ID: String = "ca-app-pub-1852108665659812/4812712000"
+# Google Official Test Ad Unit IDs (production IDs are loaded from gitignored res://admob_secrets.gd)
+const ADMOB_APP_ID: String = "ca-app-pub-3940256099942544~3347511713"
+const BANNER_AD_ID: String = "ca-app-pub-3940256099942544/6300978111"
 const INTERSTITIAL_AD_ID: String = "ca-app-pub-3940256099942544/1033173712"
 const REWARDED_AD_ID: String = "ca-app-pub-3940256099942544/5224354917"
-const REWARDED_INTERSTITIAL_AD_ID: String = "ca-app-pub-3940256099942544/5354046379"
+const REWARDED_INTERSTITIAL_AD_ID: String = ""
 
 static var instance: Node
 static var is_initialized: bool = false
@@ -28,7 +28,9 @@ var _rewarded_interstitial_ad = null
 var _init_listener = null
 var _banner_cb = null
 var _interstitial_cb = null
+var _interstitial_content_cb = null
 var _rewarded_cb = null
+var _rewarded_content_cb = null
 var _reward_listener = null
 var _rewarded_interstitial_cb = null
 var _rewarded_interstitial_content_cb = null
@@ -42,18 +44,31 @@ var rewarded_interstitial_id: String = REWARDED_INTERSTITIAL_AD_ID
 func _enter_tree() -> void:
 	instance = self
 
+func _load_local_ad_ids() -> void:
+	if ResourceLoader.exists("res://admob_secrets.gd"):
+		var secrets = load("res://admob_secrets.gd")
+		if secrets != null:
+			if "BANNER_AD_ID" in secrets and not str(secrets.BANNER_AD_ID).is_empty():
+				banner_id = str(secrets.BANNER_AD_ID)
+			if "INTERSTITIAL_AD_ID" in secrets and not str(secrets.INTERSTITIAL_AD_ID).is_empty():
+				interstitial_id = str(secrets.INTERSTITIAL_AD_ID)
+			if "REWARDED_AD_ID" in secrets and not str(secrets.REWARDED_AD_ID).is_empty():
+				rewarded_id = str(secrets.REWARDED_AD_ID)
+			print("[AdManager] Loaded local AdMob IDs from res://admob_secrets.gd")
+
 func _ready() -> void:
 	print("[AdManager] _ready - checking for MobileAds plugin...")
 	if OS.get_name() == "Android":
 		_plugin_available = true
+		_load_local_ad_ids()
 		
 		# Auto-inject test IDs in debug builds to prevent No Fill errors
 		if OS.has_feature("debug"):
 			print("[AdManager] Debug build detected: Using Test IDs")
-			banner_id = BANNER_AD_ID.replace("~", "/")
+			banner_id = "ca-app-pub-3940256099942544/6300978111"
 			interstitial_id = "ca-app-pub-3940256099942544/1033173712"
 			rewarded_id = "ca-app-pub-3940256099942544/5224354917"
-		rewarded_interstitial_id = "ca-app-pub-3940256099942544/5354046379"
+			rewarded_interstitial_id = "ca-app-pub-3940256099942544/5354046379"
 			
 		print("[AdManager] Running on Android - initializing AdMob with banner: ", banner_id)
 		_init_admob()
@@ -125,12 +140,14 @@ func _load_interstitial() -> void:
 	_interstitial_cb.on_ad_loaded = func(ad: InterstitialAd) -> void:
 		_interstitial_ad = ad
 		print("[AdManager] Interstitial Ad loaded!")
-		ad.full_screen_content_callback.on_ad_dismissed_full_screen_content = func():
+		_interstitial_content_cb = FullScreenContentCallback.new()
+		_interstitial_content_cb.on_ad_dismissed_full_screen_content = func():
 			_interstitial_ad = null
-		_load_interstitial()
-		ad.full_screen_content_callback.on_ad_failed_to_show_full_screen_content = func(_err):
+			_load_interstitial()
+		_interstitial_content_cb.on_ad_failed_to_show_full_screen_content = func(_err):
 			_interstitial_ad = null
-		_load_interstitial()
+			_load_interstitial()
+		ad.full_screen_content_callback = _interstitial_content_cb
 
 	_interstitial_cb.on_ad_failed_to_load = func(_err) -> void:
 		_interstitial_ad = null
@@ -158,12 +175,14 @@ func _load_rewarded() -> void:
 	_rewarded_cb.on_ad_loaded = func(ad: RewardedAd) -> void:
 		_rewarded_ad = ad
 		print("[AdManager] Rewarded Ad loaded!")
-		ad.full_screen_content_callback.on_ad_dismissed_full_screen_content = func():
+		_rewarded_content_cb = FullScreenContentCallback.new()
+		_rewarded_content_cb.on_ad_dismissed_full_screen_content = func():
 			_rewarded_ad = null
 			_load_rewarded()
-		ad.full_screen_content_callback.on_ad_failed_to_show_full_screen_content = func(_err):
+		_rewarded_content_cb.on_ad_failed_to_show_full_screen_content = func(_err):
 			_rewarded_ad = null
 			_load_rewarded()
+		ad.full_screen_content_callback = _rewarded_content_cb
 
 	_rewarded_cb.on_ad_failed_to_load = func(_err) -> void:
 		_rewarded_ad = null
@@ -181,11 +200,16 @@ func show_rewarded_video() -> bool:
 		_reward_listener = OnUserEarnedRewardListener.new()
 		_reward_listener.on_user_earned_reward = func(_item):
 			user_rewarded[0] = true
-		_rewarded_ad.full_screen_content_callback.on_ad_dismissed_full_screen_content = func():
+		_rewarded_content_cb = FullScreenContentCallback.new()
+		_rewarded_content_cb.on_ad_dismissed_full_screen_content = func():
 			_rewarded_ad = null
 			_load_rewarded()
 			if user_rewarded[0]:
 				rewarded_video_completed.emit()
+		_rewarded_content_cb.on_ad_failed_to_show_full_screen_content = func(_err):
+			_rewarded_ad = null
+			_load_rewarded()
+		_rewarded_ad.full_screen_content_callback = _rewarded_content_cb
 		_rewarded_ad.show(_reward_listener)
 		return true
 
@@ -196,7 +220,7 @@ func show_rewarded_video() -> bool:
 # =================== REWARDED INTERSTITIAL ===================
 
 func _load_rewarded_interstitial() -> void:
-	if not is_initialized or _rewarded_interstitial_ad:
+	if not is_initialized or _rewarded_interstitial_ad or rewarded_interstitial_id.is_empty():
 		return
 	var loader := RewardedInterstitialAdLoader.new()
 	_rewarded_interstitial_cb = RewardedInterstitialAdLoadCallback.new()
@@ -216,6 +240,9 @@ func _load_rewarded_interstitial() -> void:
 func show_rewarded_interstitial() -> bool:
 	if not _plugin_available:
 		rewarded_interstitial_unavailable.emit("Rewarded interstitials are available on Android builds only.")
+		return false
+	if rewarded_interstitial_id.is_empty():
+		rewarded_interstitial_unavailable.emit("Rewarded interstitials are currently unavailable.")
 		return false
 	if not _rewarded_interstitial_ad:
 		rewarded_interstitial_unavailable.emit("The rewarded interstitial is still loading. Please try again shortly.")

@@ -58,8 +58,9 @@ func _ready() -> void:
 		screen_requested.emit("leaderboard")
 	)
 	if has_node("%DifficultyModeButton"):
-		_update_mode_button()
-		%DifficultyModeButton.pressed.connect(_on_mode_button_pressed)
+		%DifficultyModeButton.visible = false
+	if has_node("%RewardedButton"):
+		%RewardedButton.visible = false
 
 func _update_mode_button() -> void:
 	if not has_node("%DifficultyModeButton"):

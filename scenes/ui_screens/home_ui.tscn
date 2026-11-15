@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="FontVariation" path="res://resources/ui_bold_font.tres" id="bold_font"]
 
@@ -278,7 +278,7 @@ custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
 [node name="ActionBox" type="Control" parent="Scroll/Margin/Layout"]
-custom_minimum_size = Vector2(0, 370)
+custom_minimum_size = Vector2(0, 218)
 layout_mode = 2
 
 [node name="ActionPanel" type="PanelContainer" parent="Scroll/Margin/Layout/ActionBox"]

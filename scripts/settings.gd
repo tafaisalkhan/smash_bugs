@@ -17,6 +17,11 @@ const Palette = preload("res://scripts/ui_palette.gd")
 func _ready() -> void:
 	Palette.apply_background($Background, GameState.selected_theme)
 	_apply_popup_style()
+	# Campaign difficulty advances automatically, so there is no player-facing
+	# Easy / Medium / Hard selector in Settings.
+	var difficulty_row := get_node_or_null("Margin/VBox/Panel/Scroll/Content/DifficultyRow")
+	if is_instance_valid(difficulty_row):
+		difficulty_row.visible = false
 	difficulty_dropdown.select(clampi(GameState.difficulty_index, 0, 2))
 	music_toggle.button_pressed = GameState.music_enabled
 	sfx_toggle.button_pressed = GameState.sfx_enabled

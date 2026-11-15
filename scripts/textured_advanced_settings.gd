@@ -38,6 +38,10 @@ func _refresh_values() -> void:
 		var box := Rect2(0.63, 0.226 + float(row) * 0.071, 0.17, 0.05)
 		var label := _label(value, box, 16 if row >= 2 and row <= 4 else 13, Color("#073e3d") if row in [0, 1, 5, 6] else Color("#553400"))
 		label.set_meta("value_label", true)
+	var ads_text := "OWNED ✓" if GameState.ads_removed else "$4.99"
+	var ads_color := Color("#2e7d32") if GameState.ads_removed else Color("#d35400")
+	var ads_label := _label(ads_text, Rect2(0.60, 0.226 + 7.0 * 0.071, 0.22, 0.05), 15, ads_color)
+	ads_label.set_meta("value_label", true)
 
 func _toggle(row: int) -> void:
 	match row:
@@ -70,7 +74,16 @@ func _cycle(row: int) -> void:
 	_refresh_values()
 
 func _remove_ads() -> void:
-	_status.text = "Ads already removed." if GameState.ads_removed else "Google Play Billing is not connected yet."
+	if GameState.ads_removed:
+		_status.text = "Ads already removed."
+		return
+	GameState.ads_removed = true
+	GameState.save_progress()
+	var ad_mgr = get_node_or_null("/root/AdManager")
+	if ad_mgr and ad_mgr.has_method("hide_banner"):
+		ad_mgr.hide_banner()
+	_status.text = "All ads permanently removed! ($4.99)"
+	_refresh_values()
 
 func _go_back() -> void:
 	if _leaving:

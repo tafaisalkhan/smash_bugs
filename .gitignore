@@ -28,6 +28,13 @@ assets/
 *.json
 **/*.json
 
+# Keep the authored Smash level catalog in source control.
+!assets/
+assets/*
+!assets/data/
+assets/data/*
+!assets/data/smash_level_types.json
+
 # Exclude keystores as requested ("no keystore")
 *.keystore
 *.jks
@@ -39,3 +46,7 @@ test_gameplay_out.txt
 *.log
 .DS_Store
 Thumbs.db
+
+# Local-only AdMob production IDs
+admob_secrets.gd
+admob_secrets.gd.uid
